@@ -5,7 +5,7 @@ import { useFocusedNodeIndex } from "./useFocusedNodeIndex";
 import { Cover} from "./Cover";
 import { Spacer} from "./Spacer";
 import { Title } from "./Title";
-import {BasicNode} from "../Node/BasicNode";
+import { BasicNode } from "../Node/BasicNode";
 
 import { nanoid } from "nanoid";
 

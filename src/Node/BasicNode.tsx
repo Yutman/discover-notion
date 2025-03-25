@@ -1,7 +1,7 @@
 // This coomponent represents blocks of content. It can be image, list, text etc.
 // The user can add, remove, and edit these blocks.
 
-import { NodeData } from "../utils/types";
+import { NodeData, NodeType } from "../utils/types";
 import styles from "./Node.module.css";
 import {
   useRef,
@@ -11,6 +11,8 @@ import {
 } from "react";
 import { nanoid } from "nanoid";
 import { useAppState } from "../state/ApppStateContext";
+import { CommandPanel } from "./CommandPanel";
+import cx from "classnames";
 
 type BasicNodeProps = {
   node: NodeData;
@@ -26,8 +28,10 @@ export const BasicNode = ({
   index,
 }: BasicNodeProps) => {
   const nodeRef = useRef<HTMLDivElement>(null);
+  const showCommandPanel = isFocused && node?.value?.match(/^\//);
 
-  const { changeNodeValue, addNode, removeNodeByIndex } = useAppState();
+  const { changeNodeValue, addNode, removeNodeByIndex, changeNodeType } =
+    useAppState();
 
   useEffect(() => {
     if (isFocused) {
@@ -42,6 +46,13 @@ export const BasicNode = ({
       nodeRef.current.textContent = node.value;
     }
   }, [node]); // keep track of node
+
+  const parseCommand = (nodeType: NodeType) => {
+    if (nodeRef.current) {
+      changeNodeType(index, nodeType);
+      nodeRef.current.textContent = "";
+    }
+  };
 
   const handleInput: FormEventHandler<HTMLDivElement> = ({ currentTarget }) => {
     const { textContent } = currentTarget;
@@ -63,27 +74,32 @@ export const BasicNode = ({
       updateFocusedIndex(index + 1);
     }
 
-if (event.key === 'Backspace')
-    if(target.textContent?.length === 0) {
-      event.preventDefault();
-      removeNodeByIndex(index);
-      updateFocusedIndex(index - 1);
-    } else if (window?.getSelection()?.anchorOffset === 0) {
-      event.preventDefault();
-      removeNodeByIndex(index);
-      updateFocusedIndex(index - 1);
-    }
+    if (event.key === "Backspace")
+      if (target.textContent?.length === 0) {
+        event.preventDefault();
+        removeNodeByIndex(index);
+        updateFocusedIndex(index - 1);
+      } else if (window?.getSelection()?.anchorOffset === 0) {
+        event.preventDefault();
+        removeNodeByIndex(index);
+        updateFocusedIndex(index - 1);
+      }
   };
 
   return (
-    <div
-      onInput={handleInput}
-      onClick={handleClick}
-      onKeyDown={onKeyDown}
-      ref={nodeRef}
-      contentEditable
-      suppressContentEditableWarning
-      className={styles.node}
-    />
+    <>
+      {showCommandPanel && (
+        <CommandPanel selectItem={parseCommand} nodeText={node.value} />
+      )}
+      <div
+        onInput={handleInput}
+        onClick={handleClick}
+        onKeyDown={onKeyDown}
+        ref={nodeRef}
+        contentEditable
+        suppressContentEditableWarning
+        className={cx(styles.node, styles[node.type])}
+      />
+    </>
   );
 };

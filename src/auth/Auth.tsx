@@ -8,6 +8,7 @@ export const Auth = () => {
 	const [loading, setLoading] = useState(false)
 	const [email, setEmail] = useState("")
 	const { session } = useAuthSession()
+// this is the state that will hold the loading state, the email and the session
 
 	const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -16,17 +17,17 @@ export const Auth = () => {
 			setLoading(true)
 			const { error } = await supabase.auth.signInWithOtp({ email })
 			if(error) throw error
-			alert("CHeck your email for the login link!")
+			alert("Check your email for the login link!")
 		} catch (error){
 			alert(error)
 		} finally {
 			setLoading(false)
 		}
-	}
+	} // this is the function that will handle the login
 
 	if(session){
 		return <Navigate to="/" />
-	}
+	} // this will redirect the user to the home page if they are already logged in
 
 	return (
 		<div className={styles.centeredFlex}>
@@ -50,6 +51,6 @@ export const Auth = () => {
 				)}
 			</div>
 		</div>
-	)
+	) // this is the jsx that will be rendered
 
 }
